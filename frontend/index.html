@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill.ai - AI-Powered PDF Form Assistant</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="40" height="40" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="238" height="238" rx="51" fill="url(#paint0_linear_2_7)" fill-opacity="0.83"/>
+                        <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                        <defs>
+                            <linearGradient id="paint0_linear_2_7" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#853CFF"/>
+                                <stop offset="1" stop-color="#A855F7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">fill.ai</span>
+            </div>
+            <div class="header-status">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle"></i>
+                    <span>Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="container">
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <h2>Upload Your Form</h2>
+                        <p>Drag and drop your PDF or image file to get started</p>
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop your file here</h3>
+                        <p>or <span class="upload-link">browse files</span></p>
+                        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section class="processing-section" id="processingSection" style="display: none;">
+                <div class="processing-card">
+                    <div class="processing-header">
+                        <div class="processing-logo">
+                            <svg width="60" height="60" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="238" height="238" rx="51" fill="url(#processingGradient)" fill-opacity="0.83"/>
+                                <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                                <defs>
+                                    <linearGradient id="processingGradient" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#853CFF"/>
+                                        <stop offset="1" stop-color="#A855F7"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Processing Your Form</h3>
+                        <p id="processingMessage">Analyzing form structure...</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conversation Section -->
+            <section class="conversation-section" id="conversationSection" style="display: none;">
+                <div class="conversation-card">
+                    <div class="conversation-header">
+                        <div class="conversation-info">
+                            <h3>AI Form Assistant</h3>
+                            <p id="conversationStatus">Ready to help you fill out the form</p>
+                        </div>
+                        <div class="conversation-controls">
+                            <div class="voice-indicator" id="voiceIndicator">
+                                <i class="fas fa-microphone"></i>
+                                <span>Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-content">
+                        <div class="ai-message" id="aiMessage">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p id="aiMessageText">Welcome! I'll help you fill out this form through conversation.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="user-message" id="userMessage" style="display: none;">
+                            <div class="message-content">
+                                <p id="userMessageText"></p>
+                            </div>
+                            <div class="message-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-progress">
+                        <div class="progress-info">
+                            <span id="progressText">Question 1 of 5</span>
+                            <span id="progressPercent">20%</span>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" id="progressFillSmall"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <h3>Form Completed!</h3>
+                        <p>Your filled form is ready for download</p>
+                    </div>
+                    <div class="results-content">
+                        <div class="form-preview" id="formPreview">
+                            <img id="generatedImage" src="" alt="Generated form">
+                        </div>
+                        <div class="results-actions">
+                            <button class="btn btn-primary" id="downloadBtn">
+                                <i class="fas fa-download"></i>
+                                Download Form
+                            </button>
+                            <button class="btn btn-secondary" id="newFormBtn">
+                                <i class="fas fa-plus"></i>
+                                Fill Another Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Real-time Speech Display -->
+    <div class="speech-overlay" id="speechOverlay" style="display: none;">
+        <div class="speech-content">
+            <div class="speech-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="speech-text">
+                <p id="speechText">AI is speaking...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg width="32" height="32" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="238" height="238" rx="51" fill="url(#footerLogoGradient)" fill-opacity="0.83"/>
+                                <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                                <defs>
+                                    <linearGradient id="footerLogoGradient" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#853CFF"/>
+                                        <stop offset="1" stop-color="#A855F7"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <span class="logo-text">fill.ai</span>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Fill.ai. Making forms accessible for everyone.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

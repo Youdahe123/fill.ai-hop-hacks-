@@ -1,0 +1,30 @@
+{
+  "name": "fill-ai-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Fill.ai - AI-powered PDF form assistant",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "dev": "python -m http.server 3000",
+    "build": "echo 'No build process needed for vanilla HTML/CSS/JS'",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "pdf",
+    "forms",
+    "ai",
+    "accessibility",
+    "voice",
+    "conversation",
+    "assistant"
+  ],
+  "author": "Fill.ai Team",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

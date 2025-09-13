@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fill.ai Debug Connection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<body>
+    <h1>Fill.ai Connection Debug</h1>
+    <div id="status">Initializing...</div>
+    <div id="logs" style="font-family: monospace; white-space: pre-wrap;"></div>
+
+    <script>
+        const status = document.getElementById('status');
+        const logs = document.getElementById('logs');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            console.log(timestamp + ': ' + message);
+            logs.textContent += timestamp + ': ' + message + '\n';
+        }
+        
+        log('Starting Fill.ai connection test...');
+        
+        // Test the exact same connection as the main app
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.hostname}:5001`;
+        
+        log('Connecting to: ' + wsUrl);
+        status.textContent = 'Connecting to: ' + wsUrl;
+        
+        const socket = io(wsUrl, {
+            transports: ['websocket', 'polling'],
+            timeout: 10000,
+            forceNew: true
+        });
+        
+        socket.on('connect', function() {
+            log('✅ Connected successfully!');
+            status.textContent = '✅ Connected to Fill.ai backend';
+            status.style.color = 'green';
+        });
+        
+        socket.on('connect_error', function(error) {
+            log('❌ Connection error: ' + error.message);
+            status.textContent = '❌ Connection failed: ' + error.message;
+            status.style.color = 'red';
+        });
+        
+        socket.on('disconnect', function(reason) {
+            log('Disconnected: ' + reason);
+            status.textContent = 'Disconnected: ' + reason;
+            status.style.color = 'orange';
+        });
+        
+        socket.on('error', function(error) {
+            log('Socket error: ' + error);
+        });
+        
+        // Test sending a message
+        setTimeout(() => {
+            if (socket.connected) {
+                log('Testing message send...');
+                socket.emit('test', {message: 'Hello from frontend'});
+            } else {
+                log('Socket not connected, cannot send test message');
+            }
+        }, 2000);
+        
+        // Test receiving messages
+        socket.on('test_response', function(data) {
+            log('Received test response: ' + JSON.stringify(data));
+        });
+    </script>
+</body>
+</html>

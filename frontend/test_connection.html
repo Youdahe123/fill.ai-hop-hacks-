@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Connection Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="logs"></div>
+
+    <script>
+        const status = document.getElementById('status');
+        const logs = document.getElementById('logs');
+        
+        function log(message) {
+            console.log(message);
+            logs.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+        }
+        
+        log('Starting WebSocket connection test...');
+        
+        // Test different connection URLs
+        const urls = [
+            'http://localhost:5001',
+            'ws://localhost:5001',
+            'http://127.0.0.1:5001',
+            'ws://127.0.0.1:5001'
+        ];
+        
+        let currentUrlIndex = 0;
+        
+        function tryConnection() {
+            if (currentUrlIndex >= urls.length) {
+                status.textContent = 'All connection attempts failed';
+                return;
+            }
+            
+            const url = urls[currentUrlIndex];
+            log('Trying: ' + url);
+            
+            try {
+                const socket = io(url, {
+                    transports: ['websocket', 'polling'],
+                    timeout: 5000
+                });
+                
+                socket.on('connect', function() {
+                    log('✅ Connected to: ' + url);
+                    status.textContent = 'Connected to: ' + url;
+                    status.style.color = 'green';
+                });
+                
+                socket.on('connect_error', function(error) {
+                    log('❌ Connection error for ' + url + ': ' + error.message);
+                    currentUrlIndex++;
+                    setTimeout(tryConnection, 1000);
+                });
+                
+                socket.on('disconnect', function() {
+                    log('Disconnected from: ' + url);
+                });
+                
+            } catch (error) {
+                log('❌ Error creating socket for ' + url + ': ' + error.message);
+                currentUrlIndex++;
+                setTimeout(tryConnection, 1000);
+            }
+        }
+        
+        tryConnection();
+    </script>
+</body>
+</html>
