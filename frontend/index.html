@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -16,12 +18,15 @@
             <div class="logo">
                 <div class="logo-icon">
                     <svg width="40" height="40" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="238" height="238" rx="51" fill="url(#paint0_linear_2_7)" fill-opacity="0.83"/>
-                        <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                        <rect width="238" height="238" rx="51" fill="url(#paint0_linear_2_7)" fill-opacity="0.83" />
+                        <path
+                            d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z"
+                            fill="white" />
                         <defs>
-                            <linearGradient id="paint0_linear_2_7" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#853CFF"/>
-                                <stop offset="1" stop-color="#A855F7"/>
+                            <linearGradient id="paint0_linear_2_7" x1="11.5" y1="119" x2="134.5" y2="79.5"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#853CFF" />
+                                <stop offset="1" stop-color="#A855F7" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -63,13 +68,18 @@
                 <div class="processing-card">
                     <div class="processing-header">
                         <div class="processing-logo">
-                            <svg width="60" height="60" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="238" height="238" rx="51" fill="url(#processingGradient)" fill-opacity="0.83"/>
-                                <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                            <svg width="60" height="60" viewBox="0 0 238 238" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="238" height="238" rx="51" fill="url(#processingGradient)"
+                                    fill-opacity="0.83" />
+                                <path
+                                    d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z"
+                                    fill="white" />
                                 <defs>
-                                    <linearGradient id="processingGradient" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
-                                        <stop stop-color="#853CFF"/>
-                                        <stop offset="1" stop-color="#A855F7"/>
+                                    <linearGradient id="processingGradient" x1="11.5" y1="119" x2="134.5" y2="79.5"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#853CFF" />
+                                        <stop offset="1" stop-color="#A855F7" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -92,23 +102,35 @@
                             <p id="conversationStatus">Ready to help you fill out the form</p>
                         </div>
                         <div class="conversation-controls">
+                            <div class="language-selector">
+                                <label for="languageSelect">
+                                    <i class="fas fa-globe"></i>
+                                    Language:
+                                </label>
+                                <select id="languageSelect" class="language-select">
+                                    <option value="en-US" selected>English</option>
+                                    <option value="uk-UA">Українська (Ukrainian)</option>
+                                    <option value="am-ET">አማርኛ (Amharic)</option>
+                                </select>
+                            </div>
                             <div class="voice-indicator" id="voiceIndicator">
                                 <i class="fas fa-microphone"></i>
                                 <span>Ready</span>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="conversation-content">
                         <div class="ai-message" id="aiMessage">
                             <div class="message-avatar">
                                 <i class="fas fa-robot"></i>
                             </div>
                             <div class="message-content">
-                                <p id="aiMessageText">Welcome! I'll help you fill out this form through conversation.</p>
+                                <p id="aiMessageText">Welcome! I'll help you fill out this form through conversation.
+                                </p>
                             </div>
                         </div>
-                        
+
                         <div class="user-message" id="userMessage" style="display: none;">
                             <div class="message-content">
                                 <p id="userMessageText"></p>
@@ -118,7 +140,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-progress">
                         <div class="progress-info">
                             <span id="progressText">Question 1 of 5</span>
@@ -177,13 +199,18 @@
                 <div class="footer-logo">
                     <div class="logo">
                         <div class="logo-icon">
-                            <svg width="32" height="32" viewBox="0 0 238 238" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="238" height="238" rx="51" fill="url(#footerLogoGradient)" fill-opacity="0.83"/>
-                                <path d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z" fill="white"/>
+                            <svg width="32" height="32" viewBox="0 0 238 238" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect width="238" height="238" rx="51" fill="url(#footerLogoGradient)"
+                                    fill-opacity="0.83" />
+                                <path
+                                    d="M187 56H108.625C84.3677 58.8808 60.3339 77.8155 55.4813 101.5C55.0974 103.374 55 105.092 55 107V123.731V178.5C55 182.278 54.7218 182 58.5 182H86C89.572 182 89.428 181.986 89.6598 178.5C89.9663 173.889 90.9095 169.606 92.6406 165.067C96.25 155.605 104.549 142.609 108.625 138.672C115.65 131.887 124.113 127.595 132.806 123.731C145 118.312 157.645 113.736 167.406 104.308C181.276 90.9115 185.527 74.1352 187 56Z"
+                                    fill="white" />
                                 <defs>
-                                    <linearGradient id="footerLogoGradient" x1="11.5" y1="119" x2="134.5" y2="79.5" gradientUnits="userSpaceOnUse">
-                                        <stop stop-color="#853CFF"/>
-                                        <stop offset="1" stop-color="#A855F7"/>
+                                    <linearGradient id="footerLogoGradient" x1="11.5" y1="119" x2="134.5" y2="79.5"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#853CFF" />
+                                        <stop offset="1" stop-color="#A855F7" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -205,4 +232,5 @@
 
     <script src="assets/js/script.js"></script>
 </body>
+
 </html>
