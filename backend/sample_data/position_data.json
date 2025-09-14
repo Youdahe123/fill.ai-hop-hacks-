@@ -1,46 +1,58 @@
 {
-    "alien_registration_number": [
-        0.2637254901960784,
-        0.57227272727272726
-    ],
-    "uscis_online_account_number": [
-        0.3137254901960784,
-        0.40863636363636363
-    ],
-    "family_name": [
-        0.3137254901960784,
-        0.5198484848484849
-    ],
-    "given_name": [
-        0.3137254901960784,
-        0.5501515151515152
-    ],
-    "middle_name": [
-        0.3137254901960784,
-        0.5787272727272728
-    ],
-    "has_name_legally_changed_yes": [
-        0.47058823529411764,
-        0.6374242424242424
-    ],
-    "has_name_legally_changed_no": [
-        0.47058823529411764,
-        0.6374242424242424
-    ],
-    "na_previous_card_not_received": [
-        0.47058823529411764,
-        0.7042424242424242
-    ],
-    "previous_card_family_name": [
-        0.3137254901960784,
-        0.8227272727272728
-    ],
-    "previous_card_given_name": [
-        0.3137254901960784,
-        0.8532727272727273
-    ],
-    "previous_card_middle_name": [
-        0.3137254901960784,
-        0.8817575757575759
-    ]
+    "coordinates": {
+        "alien_registration_number": [
+            0.2637254901960784,
+            0.57227272727272726
+        ],
+        "uscis_online_account_number": [
+            0.3137254901960784,
+            0.40863636363636363
+        ],
+        "family_name": [
+            0.3137254901960784,
+            0.5198484848484849
+        ],
+        "given_name": [
+            0.3137254901960784,
+            0.5501515151515152
+        ],
+        "middle_name": [
+            0.3137254901960784,
+            0.5787272727272728
+        ],
+        "has_name_legally_changed_yes": [
+            0.47058823529411764,
+            0.6374242424242424
+        ],
+        "has_name_legally_changed_no": [
+            0.47058823529411764,
+            0.6374242424242424
+        ],
+        "na_previous_card_not_received": [
+            0.47058823529411764,
+            0.7042424242424242
+        ],
+        "previous_card_family_name": [
+            0.3137254901960784,
+            0.8227272727272728
+        ],
+        "previous_card_given_name": [
+            0.3137254901960784,
+            0.8532727272727273
+        ],
+        "previous_card_middle_name": [
+            0.3137254901960784,
+            0.8817575757575759
+        ]
+    },
+    "hardcoded_values": {
+        "family_name": "Smith",
+        "given_name": "John",
+        "middle_name": "Michael",
+        "alien_registration_number": "A123456789",
+        "uscis_online_account_number": "USR987654321",
+        "email": "john.smith@example.com",
+        "phone": "+1-555-123-4567",
+        "date_of_birth": "01/15/1990"
+    }
 }

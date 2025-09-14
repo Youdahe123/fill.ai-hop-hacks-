@@ -16,6 +16,40 @@ key = os.getenv('AZURE_KEY')
 client = DocumentIntelligenceClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 res = []
 
+def apply_hardcoded_values(schema):
+    """
+    Apply hardcoded values to specific fields in the schema.
+    Modify this function to set your predefined values.
+    """
+    # Define your hardcoded values here
+    hardcoded_values = {
+        'family_name': 'Smith',
+        'given_name': 'John',
+        'middle_name': 'Michael',
+        'email': 'john.smith@example.com',
+        'phone': '+1-555-123-4567',
+        'date_of_birth': '01/15/1990',
+        'address': '123 Main Street, City, State 12345',
+        'country': 'United States',
+        'occupation': 'Software Engineer'
+    }
+    
+    # Apply hardcoded values to matching fields
+    if 'fields' in schema:
+        for field in schema['fields']:
+            field_label = field.get('label', '').lower().replace(' ', '_').replace('-', '_')
+            field_name = field.get('name', '').lower().replace(' ', '_').replace('-', '_')
+            
+            # Check if we have a hardcoded value for this field
+            for key, value in hardcoded_values.items():
+                if (key in field_label or key in field_name or 
+                    field_label in key or field_name in key):
+                    field['value'] = value
+                    print(f"🔧 Hardcoded value set: {field.get('label', 'Unknown')} = {value}")
+                    break
+    
+    return schema
+
 def extract_and_generate_schema(file_path):
     """
     Extract text from image using Azure OCR and generate form schema using OpenAI
@@ -112,6 +146,10 @@ def extract_and_generate_schema(file_path):
         try:
             structured = json.loads(answer)
             form_title = structured.get('form_title', 'Unknown Form')
+            
+            # Apply hardcoded values
+            structured = apply_hardcoded_values(structured)
+            
             print(f"✅ Successfully generated schema for '{form_title}' with {len(structured.get('fields', []))} fields")
             
             return {

@@ -129,6 +129,52 @@ def upload_file():
     
     return jsonify({'error': 'Invalid file type'}), 400
 
+@app.route('/extract_schema', methods=['POST'])
+def extract_schema():
+    """Extract JSON schema from uploaded form image"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Save the uploaded file temporarily
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            
+            # Import the schema extraction function
+            from server.practice import extract_and_generate_schema
+            
+            # Extract schema using your existing function
+            schema_result = extract_and_generate_schema(file_path)
+            
+            if schema_result.get('success'):
+                return jsonify({
+                    'success': True,
+                    'schema': schema_result['schema'],
+                    'fields': schema_result['fields'],
+                    'form_title': schema_result.get('form_title', 'Unknown Form'),
+                    'raw_text': schema_result['raw_text'],
+                    'processing_time': {
+                        'azure_time': schema_result['azure_time'],
+                        'openai_time': schema_result['openai_time']
+                    }
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': schema_result.get('error', 'Schema extraction failed')
+                }), 500
+        
+        return jsonify({'error': 'Invalid file type. Allowed: PDF, PNG, JPG, JPEG'}), 400
+        
+    except Exception as e:
+        return jsonify({'error': f'Schema extraction failed: {str(e)}'}), 500
+
 @socketio.on('connect')
 def handle_connect():
     """Handle client connection"""

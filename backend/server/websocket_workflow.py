@@ -18,6 +18,15 @@ from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
 import pygame
 
+# Import hardcoded values manager
+try:
+    sys.path.append('..')
+    from hardcoded_values_manager import hardcoded_manager
+    HARDCODED_VALUES_AVAILABLE = True
+except ImportError:
+    HARDCODED_VALUES_AVAILABLE = False
+    print("⚠️ Hardcoded values manager not available")
+
 class WebSocketSpeechFormFiller:
     def __init__(self, socketio_emitter=None):
         """Initialize the WebSocket-enabled form filler"""
@@ -67,7 +76,9 @@ class WebSocketSpeechFormFiller:
             'english': {'code': 'en', 'name': 'English'},
             'ukrainian': {'code': 'uk', 'name': 'Ukrainian'},
             'hindi': {'code': 'hd', 'name': 'Hindi'},
-            'chinese': {'code': 'zh', 'name': 'Chinese'}
+            'chinese': {'code': 'zh', 'name': 'Chinese'},
+            'spanish': {'code': 'es', 'name': 'Spanish'},
+            'urdu': {'code': 'ur', 'name': 'Urdu'}
         }
         
         # Initialize human conversation AI
@@ -136,6 +147,8 @@ class WebSocketSpeechFormFiller:
             "2. Ukrainian\n"
             "3. Hindi\n"
             "4. Chinese\n"
+            "5. Spanish\n"
+            "6. Urdu\n"
             "Say the number or the language name."
         )
         
@@ -165,9 +178,17 @@ class WebSocketSpeechFormFiller:
                     self.user_language = 'chinese'
                     self.speak("Chinese selected. I'll speak with you in Chinese but record answers in English.")
                     return 'chinese'
+                elif '5' in response or 'spanish' in response_lower or 'español' in response_lower or 'castellano' in response_lower:
+                    self.user_language = 'spanish'
+                    self.speak("Spanish selected. I'll speak with you in Spanish but record answers in English.")
+                    return 'spanish'
+                elif '6' in response or 'urdu' in response_lower or 'اردو' in response_lower:
+                    self.user_language = 'urdu'
+                    self.speak("Urdu selected. I'll speak with you in Urdu but record answers in English.")
+                    return 'urdu'
                 else:
                     if attempt < max_attempts - 1:
-                        self.speak("I didn't understand. Please say 1 for English, 2 for Ukrainian, 3 for Hindi, or 4 for Chinese.")
+                        self.speak("I didn't understand. Please say 1 for English, 2 for Ukrainian, 3 for Hindi, 4 for Chinese, 5 for Spanish, or 6 for Urdu.")
                     else:
                         self.speak("Using English as default language.")
                         self.user_language = 'english'
@@ -237,8 +258,30 @@ class WebSocketSpeechFormFiller:
             return True
         else:
             print(f"❌ Unsupported language: {language}")
-            self.user_language = 'english'  # Default fallback
-            return False
+        self.user_language = 'english'  # Default fallback
+        return False
+    
+    def apply_hardcoded_values_to_fields(self):
+        """Apply hardcoded values to fields before starting conversation"""
+        if not HARDCODED_VALUES_AVAILABLE:
+            return
+        
+        hardcoded_count = 0
+        for field in self.required_fields:
+            if not field.get('value'):  # Only fill empty fields
+                hardcoded_value = hardcoded_manager.get_value_for_field(
+                    field.get('label', ''), 
+                    field.get('type', 'text')
+                )
+                if hardcoded_value:
+                    field['value'] = hardcoded_value
+                    hardcoded_count += 1
+        
+        if hardcoded_count > 0:
+            print(f"🔧 Applied {hardcoded_count} hardcoded values to fields")
+            # Filter out fields that now have values from required_fields
+            # if you want to skip them in conversation
+            # self.required_fields = [f for f in self.required_fields if not f.get('value')]
     
     def speak(self, text):
         """Convert text to speech using ElevenLabs (exactly like real_workflow)"""
@@ -341,6 +384,9 @@ class WebSocketSpeechFormFiller:
         if not self.required_fields:
             self.speak_in_user_language("No fields to fill out. Let me analyze the form first.")
             return False
+        
+        # Apply hardcoded values before starting conversation
+        self.apply_hardcoded_values_to_fields()
         
         self.is_conversation_active = True
         self.current_field_index = 0
