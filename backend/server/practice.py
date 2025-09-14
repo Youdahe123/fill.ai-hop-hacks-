@@ -28,6 +28,7 @@ def extract_and_generate_schema(file_path):
             'success': bool,
             'schema': dict,
             'fields': list,
+            'form_title': str,
             'raw_text': list,
             'azure_time': float,
             'openai_time': float
@@ -76,7 +77,8 @@ def extract_and_generate_schema(file_path):
                     "You are an assistant that takes lines from a scanned form and reconstructs a JSON form schema. "
                     "Return ONLY valid JSON in your response. For each section of the form, have a value section that will be filled in later. "
                     "Make sure to adjust for questions that require select-if questions and for questions that have conditions. "
-                    "Each field should have these sections: type, required, options, accessibility, and value."
+                    "Each field should have these sections: type, required, options, accessibility, and value. "
+                    "IMPORTANT: Also extract the title/name of the form from the document and include it in the response as 'form_title'."
                 )
             },
             {
@@ -86,7 +88,8 @@ def extract_and_generate_schema(file_path):
                     "\n".join(lines) +
                     "\nReturn ONLY valid JSON. Instead of deeply nested objects, represent each field as a flat entry in a 'fields' array. "
                     "Each field object should include: label, section (if applicable), type, required, options (if any), accessibility, and value (empty for now). "
-                    "Organize sections using a 'section' field, but keep each field as its own object."
+                    "Organize sections using a 'section' field, but keep each field as its own object. "
+                    "MUST include a 'form_title' field at the root level with the title/name of the form extracted from the text."
                 )
             }
         ]
@@ -108,12 +111,14 @@ def extract_and_generate_schema(file_path):
 
         try:
             structured = json.loads(answer)
-            print(f"✅ Successfully generated schema with {len(structured.get('fields', []))} fields")
+            form_title = structured.get('form_title', 'Unknown Form')
+            print(f"✅ Successfully generated schema for '{form_title}' with {len(structured.get('fields', []))} fields")
             
             return {
                 'success': True,
                 'schema': structured,
                 'fields': structured.get('fields', []),
+                'form_title': form_title,
                 'raw_text': lines,
                 'azure_time': azure_time,
                 'openai_time': openai_time
