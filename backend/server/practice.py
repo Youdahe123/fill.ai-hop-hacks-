@@ -6,6 +6,17 @@ import os
 import re
 from dotenv import load_dotenv
 import time
+import sys
+
+# Import hardcoded data manager
+sys.path.append('..')
+try:
+    from hardcoded_data_manager import hardcoded_manager
+    HARDCODED_MANAGER_AVAILABLE = True
+    print("✅ Hardcoded data manager loaded")
+except ImportError:
+    HARDCODED_MANAGER_AVAILABLE = False
+    print("⚠️ Hardcoded data manager not available")
 
 load_dotenv()
 Client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -19,9 +30,14 @@ res = []
 def apply_hardcoded_values(schema):
     """
     Apply hardcoded values to specific fields in the schema.
-    Modify this function to set your predefined values.
+    This function provides fallback values when the hardcoded data manager is not available.
     """
-    # Define your hardcoded values here
+    # Use the hardcoded data manager if available
+    if HARDCODED_MANAGER_AVAILABLE:
+        # This is now handled in extract_and_generate_schema
+        return schema
+    
+    # Fallback: Define basic hardcoded values here
     hardcoded_values = {
         'family_name': 'Smith',
         'given_name': 'John',
@@ -50,30 +66,38 @@ def apply_hardcoded_values(schema):
     
     return schema
 
-def extract_and_generate_schema(file_path):
+def extract_and_generate_schema(image_path):
     """
-    Extract text from image using Azure OCR and generate form schema using OpenAI
+    Main function to extract form structure and generate a schema using Azure OCR and OpenAI
+    Now enhanced with hardcoded data support
+    """
     
-    Args:
-        file_path (str): Path to the uploaded image/PDF file
-        
-    Returns:
-        dict: {
-            'success': bool,
-            'schema': dict,
-            'fields': list,
-            'form_title': str,
-            'raw_text': list,
-            'azure_time': float,
-            'openai_time': float
-        }
-    """
+    # Check for hardcoded data first
+    if HARDCODED_MANAGER_AVAILABLE:
+        hardcoded_data = hardcoded_manager.find_hardcoded_data(image_path)
+        if hardcoded_data:
+            print("🎯 Using hardcoded schema and data")
+            schema = hardcoded_data.get('schema', {})
+            # Apply hardcoded values
+            schema = hardcoded_manager.apply_hardcoded_values(schema, image_path)
+            
+            return {
+                'success': True,
+                'schema': schema,
+                'fields': schema.get('fields', []),
+                'form_title': hardcoded_data.get('metadata', {}).get('form_title', 'Unknown Form'),
+                'raw_text': ['Using hardcoded data'],
+                'azure_time': 0,
+                'openai_time': 0,
+                'hardcoded': True
+            }
+    
+    # Continue with normal extraction if no hardcoded data found
     try:
-        print(f"🔍 Starting Azure OCR analysis for: {file_path}")
-        AzurestartTime = time.time()
+        azure_start = time.time()
         
         # Determine content type based on file extension
-        file_ext = os.path.splitext(file_path)[1].lower()
+        file_ext = os.path.splitext(image_path)[1].lower()
         if file_ext == '.pdf':
             content_type = "application/pdf"
         elif file_ext in ['.jpg', '.jpeg']:
@@ -84,14 +108,14 @@ def extract_and_generate_schema(file_path):
             content_type = "image/jpeg"  # default
         
         # Analyze document with Azure Document Intelligence
-        with open(file_path, "rb") as f:
+        with open(image_path, "rb") as f:
             poller = client.begin_analyze_document(
                 model_id="prebuilt-layout",
                 body=f,
                 content_type=content_type
             )
         result = poller.result()
-        azure_time = time.time() - AzurestartTime
+        azure_time = time.time() - azure_start
         print(f"✅ Azure OCR completed in {azure_time:.2f}s")
         
         # Collect all lines from the document

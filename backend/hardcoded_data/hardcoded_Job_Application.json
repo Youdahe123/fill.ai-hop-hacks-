@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "filename": "simple-job-application-form-27d287c8e2b97cd3f175c12ef67426b2-classic.png",
+    "file_hash": "b991248f6bf1f16078527b5ad5f4bcc2",
+    "extracted_at": "2025-09-14T09:16:40.422118",
+    "form_title": "Job Application"
+  },
+  "schema": {
+    "form_title": "Job Application",
+    "fields": [
+      {
+        "label": "First Name",
+        "section": "Full Name",
+        "type": "text",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Middle Name",
+        "section": "Full Name",
+        "type": "text",
+        "required": false,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Last Name",
+        "section": "Full Name",
+        "type": "text",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Month",
+        "section": "Birth Date",
+        "type": "select",
+        "required": true,
+        "options": [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Day",
+        "section": "Birth Date",
+        "type": "number",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Year",
+        "section": "Birth Date",
+        "type": "number",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Street Address",
+        "section": "Current Address",
+        "type": "text",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "Street Address Line 2",
+        "section": "Current Address",
+        "type": "text",
+        "required": false,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "City",
+        "section": "Current Address",
+        "type": "text",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      },
+      {
+        "label": "State / Province",
+        "section": "Current Address",
+        "type": "text",
+        "required": true,
+        "options": [],
+        "accessibility": "public",
+        "value": ""
+      }
+    ]
+  },
+  "coordinates": {
+    "full_name": [
+      0.11538461538461539,
+      0.27625
+    ],
+    "first_name": [
+      0.10615384615384615,
+      0.37875
+    ],
+    "middle_name": [
+      0.4169230769230769,
+      0.37875
+    ],
+    "last_name": [
+      0.7052307692307692,
+      0.37875
+    ],
+    "birth_date_month": [
+      0.3169230769230769,
+      0.51375
+    ],
+    "birth_date_day": [
+      0.62,
+      0.51375
+    ],
+    "birth_date_year": [
+      0.92,
+      0.51375
+    ],
+    "street_address": [
+      0.12307692307692308,
+      0.74375
+    ],
+    "street_address_line_2": [
+      0.1523076923076923,
+      0.855
+    ],
+    "city": [
+      0.07538461538461538,
+      0.9695
+    ],
+    "state_province": [
+      0.5923076923076923,
+      0.9675
+    ]
+  },
+  "hardcoded_values": {
+    "first_name": "John",
+    "middle_name": "Michael",
+    "last_name": "Smith",
+    "month": "Sample Month",
+    "day": "Sample Day",
+    "year": "Sample Year",
+    "street_address": "Sample Street Address",
+    "street_address_line_2": "Sample Street Address Line 2",
+    "city": "Sample City",
+    "state__province": "Sample State / Province"
+  },
+  "field_mapping": {
+    "First Name": {
+      "coordinate_key": "first_name",
+      "position": [
+        0.10615384615384615,
+        0.37875
+      ],
+      "field_type": "text",
+      "required": true
+    },
+    "Middle Name": {
+      "coordinate_key": "middle_name",
+      "position": [
+        0.4169230769230769,
+        0.37875
+      ],
+      "field_type": "text",
+      "required": false
+    },
+    "Last Name": {
+      "coordinate_key": "last_name",
+      "position": [
+        0.7052307692307692,
+        0.37875
+      ],
+      "field_type": "text",
+      "required": true
+    },
+    "Street Address": {
+      "coordinate_key": "street_address",
+      "position": [
+        0.12307692307692308,
+        0.74375
+      ],
+      "field_type": "text",
+      "required": true
+    },
+    "Street Address Line 2": {
+      "coordinate_key": "street_address_line_2",
+      "position": [
+        0.1523076923076923,
+        0.855
+      ],
+      "field_type": "text",
+      "required": false
+    },
+    "City": {
+      "coordinate_key": "city",
+      "position": [
+        0.07538461538461538,
+        0.9695
+      ],
+      "field_type": "text",
+      "required": true
+    }
+  }
+}

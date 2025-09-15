@@ -18,14 +18,15 @@ from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
 import pygame
 
-# Import hardcoded values manager
+# Import hardcoded data manager
 try:
     sys.path.append('..')
-    from hardcoded_values_manager import hardcoded_manager
+    from hardcoded_data_manager import hardcoded_manager
     HARDCODED_VALUES_AVAILABLE = True
+    print("✅ Hardcoded data manager available")
 except ImportError:
     HARDCODED_VALUES_AVAILABLE = False
-    print("⚠️ Hardcoded values manager not available")
+    print("⚠️ Hardcoded data manager not available")
 
 class WebSocketSpeechFormFiller:
     def __init__(self, socketio_emitter=None):
@@ -266,22 +267,27 @@ class WebSocketSpeechFormFiller:
         if not HARDCODED_VALUES_AVAILABLE:
             return
         
-        hardcoded_count = 0
-        for field in self.required_fields:
-            if not field.get('value'):  # Only fill empty fields
-                hardcoded_value = hardcoded_manager.get_value_for_field(
-                    field.get('label', ''), 
-                    field.get('type', 'text')
-                )
-                if hardcoded_value:
-                    field['value'] = hardcoded_value
-                    hardcoded_count += 1
-        
-        if hardcoded_count > 0:
-            print(f"🔧 Applied {hardcoded_count} hardcoded values to fields")
-            # Filter out fields that now have values from required_fields
-            # if you want to skip them in conversation
-            # self.required_fields = [f for f in self.required_fields if not f.get('value')]
+        # Apply hardcoded values using the new manager
+        if hasattr(self, 'original_image_path') and self.original_image_path:
+            # Create a temporary schema structure for the manager
+            temp_schema = {'fields': self.required_fields}
+            updated_schema = hardcoded_manager.apply_hardcoded_values(temp_schema, self.original_image_path)
+            self.required_fields = updated_schema.get('fields', self.required_fields)
+        else:
+            # Fallback to old method if no image path available
+            hardcoded_count = 0
+            for field in self.required_fields:
+                if not field.get('value'):  # Only fill empty fields
+                    hardcoded_value = hardcoded_manager.get_value_for_field(
+                        field.get('label', ''), 
+                        field.get('type', 'text')
+                    )
+                    if hardcoded_value:
+                        field['value'] = hardcoded_value
+                        hardcoded_count += 1
+            
+            if hardcoded_count > 0:
+                print(f"🔧 Applied {hardcoded_count} hardcoded values to fields")
     
     def speak(self, text):
         """Convert text to speech using ElevenLabs (exactly like real_workflow)"""
