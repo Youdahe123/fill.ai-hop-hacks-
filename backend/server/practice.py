@@ -6,6 +6,17 @@ import os
 import re
 from dotenv import load_dotenv
 import time
+import sys
+
+# Import hardcoded data manager
+sys.path.append('..')
+try:
+    from hardcoded_data_manager import hardcoded_manager
+    HARDCODED_MANAGER_AVAILABLE = True
+    print("✅ Hardcoded data manager loaded")
+except ImportError:
+    HARDCODED_MANAGER_AVAILABLE = False
+    print("⚠️ Hardcoded data manager not available")
 
 load_dotenv()
 Client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -16,29 +27,77 @@ key = os.getenv('AZURE_KEY')
 client = DocumentIntelligenceClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 res = []
 
-def extract_and_generate_schema(file_path):
+def apply_hardcoded_values(schema):
     """
-    Extract text from image using Azure OCR and generate form schema using OpenAI
+    Apply hardcoded values to specific fields in the schema.
+    This function provides fallback values when the hardcoded data manager is not available.
+    """
+    # Use the hardcoded data manager if available
+    if HARDCODED_MANAGER_AVAILABLE:
+        # This is now handled in extract_and_generate_schema
+        return schema
     
-    Args:
-        file_path (str): Path to the uploaded image/PDF file
-        
-    Returns:
-        dict: {
-            'success': bool,
-            'schema': dict,
-            'fields': list,
-            'raw_text': list,
-            'azure_time': float,
-            'openai_time': float
-        }
+    # Fallback: Define basic hardcoded values here
+    hardcoded_values = {
+        'family_name': 'Smith',
+        'given_name': 'John',
+        'middle_name': 'Michael',
+        'email': 'john.smith@example.com',
+        'phone': '+1-555-123-4567',
+        'date_of_birth': '01/15/1990',
+        'address': '123 Main Street, City, State 12345',
+        'country': 'United States',
+        'occupation': 'Software Engineer'
+    }
+    
+    # Apply hardcoded values to matching fields
+    if 'fields' in schema:
+        for field in schema['fields']:
+            field_label = field.get('label', '').lower().replace(' ', '_').replace('-', '_')
+            field_name = field.get('name', '').lower().replace(' ', '_').replace('-', '_')
+            
+            # Check if we have a hardcoded value for this field
+            for key, value in hardcoded_values.items():
+                if (key in field_label or key in field_name or 
+                    field_label in key or field_name in key):
+                    field['value'] = value
+                    print(f"🔧 Hardcoded value set: {field.get('label', 'Unknown')} = {value}")
+                    break
+    
+    return schema
+
+def extract_and_generate_schema(image_path):
     """
+    Main function to extract form structure and generate a schema using Azure OCR and OpenAI
+    Now enhanced with hardcoded data support
+    """
+    
+    # Check for hardcoded data first
+    if HARDCODED_MANAGER_AVAILABLE:
+        hardcoded_data = hardcoded_manager.find_hardcoded_data(image_path)
+        if hardcoded_data:
+            print("🎯 Using hardcoded schema and data")
+            schema = hardcoded_data.get('schema', {})
+            # Apply hardcoded values
+            schema = hardcoded_manager.apply_hardcoded_values(schema, image_path)
+            
+            return {
+                'success': True,
+                'schema': schema,
+                'fields': schema.get('fields', []),
+                'form_title': hardcoded_data.get('metadata', {}).get('form_title', 'Unknown Form'),
+                'raw_text': ['Using hardcoded data'],
+                'azure_time': 0,
+                'openai_time': 0,
+                'hardcoded': True
+            }
+    
+    # Continue with normal extraction if no hardcoded data found
     try:
-        print(f"🔍 Starting Azure OCR analysis for: {file_path}")
-        AzurestartTime = time.time()
+        azure_start = time.time()
         
         # Determine content type based on file extension
-        file_ext = os.path.splitext(file_path)[1].lower()
+        file_ext = os.path.splitext(image_path)[1].lower()
         if file_ext == '.pdf':
             content_type = "application/pdf"
         elif file_ext in ['.jpg', '.jpeg']:
@@ -49,14 +108,14 @@ def extract_and_generate_schema(file_path):
             content_type = "image/jpeg"  # default
         
         # Analyze document with Azure Document Intelligence
-        with open(file_path, "rb") as f:
+        with open(image_path, "rb") as f:
             poller = client.begin_analyze_document(
                 model_id="prebuilt-layout",
                 body=f,
                 content_type=content_type
             )
         result = poller.result()
-        azure_time = time.time() - AzurestartTime
+        azure_time = time.time() - azure_start
         print(f"✅ Azure OCR completed in {azure_time:.2f}s")
         
         # Collect all lines from the document
@@ -76,7 +135,8 @@ def extract_and_generate_schema(file_path):
                     "You are an assistant that takes lines from a scanned form and reconstructs a JSON form schema. "
                     "Return ONLY valid JSON in your response. For each section of the form, have a value section that will be filled in later. "
                     "Make sure to adjust for questions that require select-if questions and for questions that have conditions. "
-                    "Each field should have these sections: type, required, options, accessibility, and value."
+                    "Each field should have these sections: type, required, options, accessibility, and value. "
+                    "IMPORTANT: Also extract the title/name of the form from the document and include it in the response as 'form_title'."
                 )
             },
             {
@@ -86,7 +146,8 @@ def extract_and_generate_schema(file_path):
                     "\n".join(lines) +
                     "\nReturn ONLY valid JSON. Instead of deeply nested objects, represent each field as a flat entry in a 'fields' array. "
                     "Each field object should include: label, section (if applicable), type, required, options (if any), accessibility, and value (empty for now). "
-                    "Organize sections using a 'section' field, but keep each field as its own object."
+                    "Organize sections using a 'section' field, but keep each field as its own object. "
+                    "MUST include a 'form_title' field at the root level with the title/name of the form extracted from the text."
                 )
             }
         ]
@@ -108,12 +169,18 @@ def extract_and_generate_schema(file_path):
 
         try:
             structured = json.loads(answer)
-            print(f"✅ Successfully generated schema with {len(structured.get('fields', []))} fields")
+            form_title = structured.get('form_title', 'Unknown Form')
+            
+            # Apply hardcoded values
+            structured = apply_hardcoded_values(structured)
+            
+            print(f"✅ Successfully generated schema for '{form_title}' with {len(structured.get('fields', []))} fields")
             
             return {
                 'success': True,
                 'schema': structured,
                 'fields': structured.get('fields', []),
+                'form_title': form_title,
                 'raw_text': lines,
                 'azure_time': azure_time,
                 'openai_time': openai_time

@@ -1,0 +1,89 @@
+{
+    "fields": [
+        {
+            "label": "Alien Registration Number (A-Number)",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": true,
+            "options": null,
+            "accessibility": "visible",
+            "value": "123456789"
+        },
+        {
+            "label": "USCIS Online Account Number",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": false,
+            "options": null,
+            "accessibility": "visible",
+            "value": "USM987654321"
+        },
+        {
+            "label": "Family Name (Last Name)",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": true,
+            "options": null,
+            "accessibility": "visible",
+            "value": "Rodriguez"
+        },
+        {
+            "label": "Given Name (First Name)",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": true,
+            "options": null,
+            "accessibility": "visible",
+            "value": "Maria"
+        },
+        {
+            "label": "Middle Name",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": false,
+            "options": null,
+            "accessibility": "visible",
+            "value": "Carmen"
+        },
+        {
+            "label": "Has your name legally changed since the issuance of your Permanent Resident Card?",
+            "section": "Part 1. Information About You",
+            "type": "select",
+            "required": true,
+            "options": [
+                "Yes",
+                "No",
+                "N/A - I never received my previous card."
+            ],
+            "accessibility": "visible",
+            "value": "No"
+        },
+        {
+            "label": "Family Name (Last Name) - Legal Change",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": false,
+            "options": null,
+            "accessibility": "conditional",
+            "value": ""
+        },
+        {
+            "label": "Given Name (First Name) - Legal Change",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": false,
+            "options": null,
+            "accessibility": "conditional",
+            "value": ""
+        },
+        {
+            "label": "Middle Name - Legal Change",
+            "section": "Part 1. Information About You",
+            "type": "text",
+            "required": false,
+            "options": null,
+            "accessibility": "conditional",
+            "value": ""
+        }
+    ]
+}

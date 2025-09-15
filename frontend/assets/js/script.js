@@ -4,6 +4,7 @@ let isConnected = false;
 let currentSessionId = null;
 let uploadedFile = null;
 let isConversationActive = false;
+let selectedLanguage = 'en-US'; // Default language
 
 // DOM Elements
 const uploadSection = document.getElementById('uploadSection');
@@ -29,9 +30,10 @@ const speechText = document.getElementById('speechText');
 const generatedImage = document.getElementById('generatedImage');
 const downloadBtn = document.getElementById('downloadBtn');
 const newFormBtn = document.getElementById('newFormBtn');
+const languageSelect = document.getElementById('languageSelect');
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('🚀 Initializing Fill.ai frontend...');
     initializeWebSocket();
     initializeEventListeners();
@@ -40,100 +42,100 @@ document.addEventListener('DOMContentLoaded', function() {
 // WebSocket Functions
 function initializeWebSocket() {
     console.log('🔌 Initializing WebSocket connection...');
-    
+
     // Check if Socket.IO is loaded
     if (typeof io === 'undefined') {
         console.error('❌ Socket.IO library not loaded!');
         updateStatus('error', 'Socket.IO not loaded');
         return;
     }
-    
+
     console.log('✅ Socket.IO library loaded');
-    
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${"localhost"}:5001`;
-    
+
     console.log('🔗 Connecting to:', wsUrl);
     updateStatus('connecting', 'Connecting...');
-    
+
     socket = io(wsUrl, {
         transports: ['websocket', 'polling'],
         timeout: 10000,
         forceNew: true
     });
-    
-    socket.on('connect', function() {
+
+    socket.on('connect', function () {
         console.log('✅ Connected to Fill.ai backend');
         isConnected = true;
         updateStatus('ready', 'Connected');
     });
-    
-    socket.on('disconnect', function() {
+
+    socket.on('disconnect', function () {
         console.log('❌ Disconnected from Fill.ai backend');
         isConnected = false;
         updateStatus('disconnected', 'Disconnected');
     });
-    
-    socket.on('connect_error', function(error) {
+
+    socket.on('connect_error', function (error) {
         console.error('❌ Connection error:', error);
         isConnected = false;
         updateStatus('error', 'Connection failed');
     });
-    
-    socket.on('connected', function(data) {
+
+    socket.on('connected', function (data) {
         console.log('Backend connected:', data.message);
     });
-    
-    socket.on('progress_update', function(data) {
+
+    socket.on('progress_update', function (data) {
         handleProgressUpdate(data);
     });
-    
-    socket.on('speech_text', function(data) {
+
+    socket.on('speech_text', function (data) {
         handleSpeechText(data);
     });
-    
-    socket.on('generated_image', function(data) {
+
+    socket.on('generated_image', function (data) {
         handleGeneratedImage(data);
     });
-    
-    socket.on('error', function(data) {
+
+    socket.on('error', function (data) {
         handleError(data);
     });
-    
-    socket.on('processing_started', function(data) {
+
+    socket.on('processing_started', function (data) {
         console.log('Processing started:', data.message);
     });
-    
+
     // Conversation event handlers
-    socket.on('conversation_question', function(data) {
+    socket.on('conversation_question', function (data) {
         handleConversationQuestion(data);
     });
-    
-    socket.on('conversation_answer', function(data) {
+
+    socket.on('conversation_answer', function (data) {
         handleConversationAnswer(data);
     });
-    
-    socket.on('conversation_complete', function(data) {
+
+    socket.on('conversation_complete', function (data) {
         handleConversationComplete(data);
     });
-    
+
     // Voice event handlers
-    socket.on('listening', function(data) {
+    socket.on('listening', function (data) {
         handleListening(data);
     });
-    
-    socket.on('user_speech', function(data) {
+
+    socket.on('user_speech', function (data) {
         handleUserSpeech(data);
     });
-    
-    socket.on('speech_timeout', function(data) {
+
+    socket.on('speech_timeout', function (data) {
         handleSpeechTimeout(data);
     });
-    
-    socket.on('speech_error', function(data) {
+
+    socket.on('speech_error', function (data) {
         handleSpeechError(data);
     });
-    
+
     // Test connection after 2 seconds
     setTimeout(() => {
         if (!isConnected) {
@@ -157,23 +159,23 @@ function updateStatus(type, text) {
 // Progress and Speech Handling
 function handleProgressUpdate(data) {
     console.log('Progress update:', data);
-    
+
     if (data.step === 'starting') {
         showProcessingSection();
         updateStatus('processing', 'Processing');
     }
-    
+
     updateProcessingMessage(data.message);
-    
+
     if (data.progress !== null && data.progress !== undefined) {
         updateProgress(data.progress);
     }
-    
+
     if (data.step === 'conversation') {
         showConversationSection();
         updateStatus('listening', 'Ready to Listen');
     }
-    
+
     if (data.step === 'completed') {
         showResultsSection();
         updateStatus('ready', 'Completed');
@@ -182,13 +184,13 @@ function handleProgressUpdate(data) {
 
 function handleSpeechText(data) {
     console.log('Speech text:', data);
-    
+
     // Show speech overlay
     showSpeechOverlay(data.text);
-    
+
     // Update conversation display
     updateAIMessage(data.text);
-    
+
     // Update voice indicator
     if (voiceIndicator) {
         voiceIndicator.className = 'voice-indicator speaking';
@@ -201,22 +203,22 @@ function handleSpeechText(data) {
 
 function handleGeneratedImage(data) {
     console.log('Generated image:', data);
-    
+
     // Check if we have image data
     if (data.image) {
         // Show the generated image
         if (generatedImage) {
             generatedImage.src = `data:image/png;base64,${data.image}`;
             generatedImage.alt = data.description || 'Generated form';
-            
+
             // Show results section
             showResultsSection();
-            
+
             // Enable download button
             if (downloadBtn) {
                 downloadBtn.disabled = false;
             }
-            
+
             console.log('✅ Image loaded successfully');
         }
     } else if (data.image_path) {
@@ -231,14 +233,14 @@ function handleGeneratedImage(data) {
 async function fetchGeneratedImage(imagePath) {
     try {
         console.log('Fetching image from:', imagePath);
-        
+
         // Convert the image to base64
         const response = await fetch(`http://localhost:5001/get_image?path=${encodeURIComponent(imagePath)}`);
-        
+
         if (response.ok) {
             const blob = await response.blob();
             const reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = function () {
                 const base64 = reader.result.split(',')[1];
                 if (generatedImage) {
                     generatedImage.src = `data:image/png;base64,${base64}`;
@@ -277,7 +279,7 @@ function downloadGeneratedImage() {
 
 // Add image load error handling
 if (generatedImage) {
-    generatedImage.addEventListener('error', function() {
+    generatedImage.addEventListener('error', function () {
         console.error('Failed to load generated image');
         alert('Failed to load the generated image. Please try again.');
     });
@@ -286,15 +288,15 @@ if (generatedImage) {
 // Conversation handling
 function handleConversationQuestion(data) {
     console.log('Conversation question:', data);
-    
+
     // Update conversation display
     updateAIMessage(data.question);
-    
+
     // Update progress
     if (data.progress) {
         updateConversationProgress(data.progress);
     }
-    
+
     // Update conversation status
     if (conversationStatus) {
         conversationStatus.textContent = 'AI is asking a question...';
@@ -303,10 +305,10 @@ function handleConversationQuestion(data) {
 
 function handleConversationAnswer(data) {
     console.log('Conversation answer:', data);
-    
+
     // Show user's answer
     updateUserMessage(data.answer);
-    
+
     // Show confirmation if confirmed
     if (data.confirmed) {
         setTimeout(() => {
@@ -317,7 +319,7 @@ function handleConversationAnswer(data) {
 
 function handleConversationComplete(data) {
     console.log('Conversation complete:', data);
-    
+
     updateAIMessage(`Excellent! I've filled out ${data.filled_fields.length} fields. Now let me generate your completed form.`);
     if (conversationStatus) {
         conversationStatus.textContent = 'Generating your completed form...';
@@ -327,7 +329,7 @@ function handleConversationComplete(data) {
 // Voice handling
 function handleListening(data) {
     console.log('Listening for voice input:', data);
-    
+
     if (voiceIndicator) {
         voiceIndicator.className = 'voice-indicator listening';
         const span = voiceIndicator.querySelector('span');
@@ -342,10 +344,10 @@ function handleListening(data) {
 
 function handleUserSpeech(data) {
     console.log('User speech detected:', data);
-    
+
     // Show what the user said
     updateUserMessage(data.text);
-    
+
     // Reset voice indicator
     if (voiceIndicator) {
         voiceIndicator.className = 'voice-indicator';
@@ -409,7 +411,7 @@ function showResultsSection() {
     if (conversationSection) conversationSection.style.display = 'none';
     if (resultsSection) resultsSection.style.display = 'block';
     isConversationActive = false;
-    
+
     // Ensure the image is visible
     if (generatedImage && generatedImage.src && generatedImage.src !== '') {
         generatedImage.style.display = 'block';
@@ -471,7 +473,7 @@ function showSpeechOverlay(text) {
     }
     if (speechOverlay) {
         speechOverlay.style.display = 'block';
-        
+
         // Auto-hide after 5 seconds
         setTimeout(() => {
             if (speechOverlay) {
@@ -507,6 +509,11 @@ function initializeEventListeners() {
     if (newFormBtn) {
         newFormBtn.addEventListener('click', startNewForm);
     }
+
+    // Language selection
+    if (languageSelect) {
+        languageSelect.addEventListener('change', handleLanguageChange);
+    }
 }
 
 // File Upload Functions
@@ -529,7 +536,7 @@ function handleDrop(e) {
     if (uploadArea) {
         uploadArea.classList.remove('dragover');
     }
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
         handleFile(files[0]);
@@ -545,14 +552,14 @@ function handleFileSelect(e) {
 
 function handleFile(file) {
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-    
+
     if (!allowedTypes.includes(file.type)) {
         alert('Please upload a PDF, JPEG, or PNG file.');
         return;
     }
 
     uploadedFile = file;
-    
+
     // Upload file to backend
     uploadFileToBackend(file);
 }
@@ -560,15 +567,15 @@ function handleFile(file) {
 async function uploadFileToBackend(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     try {
         const response = await fetch('http://localhost:5001/upload', {
             method: 'POST',
             body: formData
         });
-        
+
         const result = await response.json();
-        
+
         if (result.file_path) {
             // Update upload area
             if (uploadArea) {
@@ -580,7 +587,7 @@ async function uploadFileToBackend(file) {
                     <p>Ready to process</p>
                 `;
             }
-            
+
             // Start processing
             startProcessing(result.file_path);
         } else {
@@ -597,7 +604,7 @@ function startProcessing(filePath) {
         alert('Not connected to backend. Please try again.');
         return;
     }
-    
+
     // Start processing via WebSocket
     if (socket) {
         socket.emit('start_processing', {
@@ -614,7 +621,7 @@ function startNewForm() {
         fileInput.value = '';
     }
     isConversationActive = false;
-    
+
     // Reset upload area
     if (uploadArea) {
         uploadArea.innerHTML = `
@@ -625,7 +632,7 @@ function startNewForm() {
             <p>or <span class="upload-link">browse files</span></p>
         `;
     }
-    
+
     // Show upload section
     showUploadSection();
     updateStatus('ready', 'Ready');
@@ -645,6 +652,29 @@ function handleError(data) {
     alert(`Error: ${data.message}`);
     showUploadSection();
     updateStatus('error', 'Error');
+}
+
+// Language Selection Functions
+function handleLanguageChange(event) {
+    selectedLanguage = event.target.value;
+    console.log('🌐 Language changed to:', selectedLanguage);
+
+    // Emit language change to backend if connected
+    if (socket && isConnected) {
+        socket.emit('language_changed', {
+            language: selectedLanguage,
+            session_id: currentSessionId
+        });
+    }
+
+    // Update UI indicator
+    const languageNames = {
+        'en-US': 'English',
+        'uk-UA': 'Ukrainian',
+        'am-ET': 'Amharic'
+    };
+
+    console.log(`✅ AI will now recognize speech in ${languageNames[selectedLanguage]}`);
 }
 
 console.log('✅ Fill.ai frontend script loaded');

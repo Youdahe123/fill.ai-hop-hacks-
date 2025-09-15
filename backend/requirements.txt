@@ -17,6 +17,7 @@ pillow==11.3.0
 PyAudio==0.2.14
 pydantic==2.11.8
 pydantic_core==2.33.2
+pygame==2.6.1
 pyobjc==11.1
 pyobjc-core==11.1
 pyobjc-framework-Accessibility==11.1
